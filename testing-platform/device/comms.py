@@ -1,4 +1,4 @@
-"""Wrappers for common comms interfaces
+""" Wrappers for common comms interfaces
 
 Classes:
     - Comms: Abstract base class for all comms classes
@@ -12,7 +12,7 @@ from serial import Serial
 
 
 class Comms(ABC):
-    """"Base comms interface
+    """ Base comms interface
     Methods:
         - open
         - close
@@ -38,18 +38,18 @@ class Comms(ABC):
 
 
 class SerialSettings(dataclass):
-    """Settings for configuring serial"""
+    """ Settings for configuring serial """
     port: str = None
     baud_rate: int = 9600
 
     @classmethod
     def create_from_config(cls, config: dict):
-        """Construct from configuration dictionary"""
+        """ Construct from configuration dictionary """
         return cls(config['port'], config['baud_rate'])
 
 
 class SerialComms(Comms):
-    """Serial comms wrapper, inherits from Comms interface class"""
+    """ Serial comms wrapper, inherits from Comms interface class """
 
     def __init__(self, settings: SerialSettings):
         self.comms_object = Serial(port=settings.port, baud_rate=settings.baud_rate)
