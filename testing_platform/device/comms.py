@@ -5,6 +5,7 @@ Classes:
     - SerialSettings
     - SerialComms
 """
+import socket
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
@@ -68,6 +69,34 @@ class SerialComms(Comms):
 
     def read(self, num_bytes):
         return self.comms_object.read(num_bytes)
+
+class UDPServer(Comms):
+    """ UDPServer class inherits from Comms interface class """
+
+    def __init__(self, sock):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    def open(self):
+
+    def close(self):
+
+    def write(self, data):
+    
+    def read(self, num_bytes):
+
+class UDPClient(Comms):
+    """ UDPClient class inherits from Comms interface class """
+
+    def __init__(self, sock):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    def open(self):
+
+    def close(self):
+
+    def write(self, data):
+
+    def read (self, num_bytes)
 
 
 # Maybe use this for functional testing of the classes in this file,
