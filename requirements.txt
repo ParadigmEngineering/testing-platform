@@ -1,1 +1,1 @@
-# Add required modules to this file
+pyserial==3.5
