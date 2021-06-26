@@ -9,3 +9,7 @@ venv.bak/
 
 # VSCode files
 .vscode/
+
+# Python intermediates
+*.egg-info/
+__pycache__/
