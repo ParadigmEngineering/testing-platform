@@ -28,7 +28,7 @@ pip install -e testing-platform
 
 To uninstall the package
 ```
-pip uninstall testing-platform
+pip uninstall testing_platform
 ```
 
 To ensure all packages were correctly installed
@@ -39,6 +39,6 @@ pip freeze
 To ensure custom packages are correctly installed, attempt to import the example package. The output should be as seen below
 ```
 python3
->> import pkgexample
+>> import testing_platform.pkgexample
 >> EXAMPLE PACKAGE IMPORTED - INSTALLATION VALID
 ```
