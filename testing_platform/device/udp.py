@@ -1,10 +1,10 @@
-import comms
+from device import Comms
 import socket
 
 class UDPServer(Comms):
     """ UDPServer class inherits from Comms interface class """
 
-    def __init__(self, sock):
+    def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def open(self):
@@ -25,7 +25,7 @@ class UDPServer(Comms):
 class UDPClient(Comms):
     """ UDPClient class inherits from Comms interface class """
 
-    def __init__(self, sock):
+    def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def open(self):
@@ -47,13 +47,11 @@ class UDPClient(Comms):
 # Maybe use this for functional testing of the classes in this file,
 # not sure if this is good practice though
 if __name__ == '__main__':
-    server_sock, client_sock = socket
-
-    server = UDPServer(server_sock)
+    server = UDPServer()
     server.open()
     server.write(b"Hello, I am a UDP Server!")
 
-    client = UDPClient(client_sock)
+    client = UDPClient()
     client.open()
     client.write(b"Hello UDP Server, this is UDP Client")
 
