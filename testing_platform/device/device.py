@@ -1,7 +1,8 @@
 import json
 import time
 from abc import ABC, abstractmethod
-from enum import Enum
+from dataclasses import dataclass
+from enum import Enum, auto
 from multiprocessing import Pipe, Process
 
 import comms
@@ -30,15 +31,23 @@ class CommsType(Enum):
             return CommsType.CAN
 
 
+class DeviceType(Enum):
+    STREAMING = "streaming"
+
+    @staticmethod
+    def get_device_type(type: str):
+        if type == DeviceType.STREAMING.value:
+            return DeviceType.STREAMING
+
+
 class Device(ABC):
-    def __init__(self, comms_type: CommsType, config: dict):
-        self.comms_type = comms_type
-        self.comms_object = create_comms_object(self.comms_type, config)
-        self.config = config
+    def __init__(self, id: str, device_type: CommsType):
+        self.id = id
+        self.device_type = device_type
 
     @abstractmethod
     def on_setup(self):
-        self.comms_object.open()
+        pass
 
     @abstractmethod
     def on_update(self, time_delta: float):
@@ -46,27 +55,42 @@ class Device(ABC):
 
     @abstractmethod
     def on_destroy(self):
-        self.comms_object.close()
+        pass
+
+
+@dataclass
+class StreamingDeviceSettings:
+    DEVICE_TYPE: DeviceType = DeviceType.STREAMING
+    comms_type: CommsType = CommsType.SERIAL
+    data: str = ''.encode()
+    interval_ms: int = 1000
+
+    @classmethod
+    def create_from_config(cls, config: dict):
+        return cls(DeviceType.STREAMING,
+                   CommsType.get_comms_type(config['comms_type']),
+                   config['data'].encode(),
+                   config['interval_ms'])
 
 
 class StreamingDevice(Device):
-    def __init__(self, comms_type: CommsType, config: dict):
-        super().__init__(comms_type, config)
-        self.data = config['data'].encode()
-        self.interval_ms = config['interval_ms']
+    def __init__(self, config: dict):
+        super().__init__(config['id'], DeviceType.STREAMING)
+        self.settings = StreamingDeviceSettings.create_from_config(config)
+        self.comms_object = create_comms_object(self.settings.comms_type, config)
         self.time_since_last_send: float = 0
 
     def on_setup(self):
-        super().on_setup()
+        self.comms_object.open()
 
     def on_update(self, time_delta: float):
         self.time_since_last_send += time_delta
-        if self.time_since_last_send > self.interval_ms:
+        if self.time_since_last_send > self.settings.interval_ms:
             self.time_since_last_send = 0
-            self.comms_object.write(self.data)
+            self.comms_object.write(self.settings.data)
 
     def on_destroy(self):
-        super().on_destroy()
+        self.comms_object.close()
 
 
 def create_comms_object(comms_type: CommsType, config: dict) -> comms.Comms:
@@ -78,9 +102,8 @@ def create_comms_object(comms_type: CommsType, config: dict) -> comms.Comms:
 
 
 def create_device_from_config(device_config: dict) -> Device:
-    comms_type: CommsType = CommsType.get_comms_type(device_config['comms_type'])
     if device_config['type'] == "streaming":
-        return StreamingDevice(comms_type, device_config)
+        return StreamingDevice(device_config)
 
 
 def create_device_and_run(device_configuration: dict, pipe: Pipe):
@@ -109,7 +132,7 @@ def create_device_and_run(device_configuration: dict, pipe: Pipe):
 
 if __name__ == '__main__':
     send_end, receive_end = Pipe()
-    device_config_s = '{"devices": {"device1": {"comms_type": "serial","port": "COM1","baud_rate": 9600,"type": "streaming","data": "Hello","interval_ms": 1000}}}'
+    device_config_s = '{"devices": {"device1": {"id": "device1", "comms_type": "serial","port": "COM7","baud_rate": 9600,"type": "streaming","data": "Hello","interval_ms": 1000}}}'
     device_config = json.loads(device_config_s)
     device = Process(target=create_device_and_run, args=(device_config['devices']['device1'], receive_end))
     device.start()
