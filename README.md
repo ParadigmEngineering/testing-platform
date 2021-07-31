@@ -7,7 +7,7 @@ the standard python venv module.
 
 **Note**: Python 3.8+ is required.
 ```
-cd {REPO_ROOT}
+cd {REPO_LOCATION}/testing-platform
 python3 -m venv .venv
 
 Windows |  \.venv\Scripts\activate 
@@ -16,14 +16,14 @@ Unix    |  .venv/bin/activate
 
 Install third-party python dependencies
 ```
-cd {REPO_ROOT}/testing_platform
+cd {REPO_LOCATION}/testing-platform
 pip install -r requirements.txt
 ```
 
 Install the project python package (in development mode)
 ```
-cd {REPO_ROOT}
-pip install -e testing_platform 
+cd {REPO_LOCATION}
+pip install -e testing-platform 
 ```
 
 To uninstall the package

@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-
+from device import Comms
 from serial import Serial
-
 class SerialSettings(dataclass):
     """ Settings for configuring serial """
     port: str = None

@@ -44,22 +44,7 @@ class UDPClient(Comms):
         print(str(addr))
 
 
-# Maybe use this for functional testing of the classes in this file,
-# not sure if this is good practice though
+# For functional testing of the udp server and client refer to worked examples
 if __name__ == '__main__':
-    server = UDPServer()
-    server.open()
-    server.write(b"Hello, I am a UDP Server!")
-
-    client = UDPClient()
-    client.open()
-    client.write(b"Hello UDP Server, this is UDP Client")
-
-    server.read(4096)
-    client.read(4096)
-
-    server.close()
-    client.close()
-    
     pass
 
