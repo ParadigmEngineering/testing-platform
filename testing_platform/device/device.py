@@ -4,7 +4,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
 from multiprocessing import Pipe, Process
-
+import serial
+import udp
 import comms
 
 class CommsType(Enum):
@@ -96,7 +97,10 @@ class StreamingDevice(Device):
 def create_comms_object(comms_type: CommsType, config: dict) -> comms.Comms:
     if comms_type == CommsType.SERIAL:
         return comms.SerialComms(comms.SerialSettings.create_from_config(config))
-    # Add other comms interfaces here once implemented
+    elif comms_type == CommsType.UDP_CLIENT:
+        return udp.UDPClient()
+    elif comms_type == CommsType.UDP_SERVER:
+        return udp.UDPServer()
     else:
         raise NotImplementedError
 
@@ -132,7 +136,9 @@ def create_device_and_run(device_configuration: dict, pipe: Pipe):
 
 if __name__ == '__main__':
     send_end, receive_end = Pipe()
-    device_config_s = '{"devices": {"device1": {"id": "device1", "comms_type": "serial","port": "COM7","baud_rate": 9600,"type": "streaming","data": "Hello","interval_ms": 1000}}}'
+    device_config_s = """{
+                        "devices": 
+                            {"device1": {"id": "device1", "comms_type": "serial","port": "COM7","baud_rate": 9600,"type": "streaming","data": "Hello","interval_ms": 1000}}}"""
     device_config = json.loads(device_config_s)
     device = Process(target=create_device_and_run, args=(device_config['devices']['device1'], receive_end))
     device.start()
