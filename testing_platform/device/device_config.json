@@ -1,0 +1,13 @@
+{
+    "devices": {
+        "device1": {
+            "id": "device1",
+            "comms_type": "Serial",
+            "port": "COM7",
+            "baud_rate": 9600,
+            "type": "streaming",
+            "data": "Hello",
+            "interval_ms": 1000
+        }
+    }
+}
