@@ -58,15 +58,19 @@ class SerialComms(Comms):
         self.comms_object.baudrate = settings.baud_rate
 
     def open(self):
+        """@override"""
         self.comms_object.open()
         
     def close(self):
+        """@override"""
         self.comms_object.close()
 
     def write(self, data):
+        """@override"""
         self.comms_object.write(data)
 
     def read(self, num_bytes):
+        """@override"""
         return self.comms_object.read(num_bytes)
 
 

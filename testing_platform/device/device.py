@@ -41,9 +41,9 @@ class DeviceType(Enum):
 
 
 class Device(ABC):
-    def __init__(self, id: str, device_type: CommsType):
+    def __init__(self, id: str, comms_type: CommsType):
         self.id = id
-        self.device_type = device_type
+        self.comms_type = comms_type
 
     @abstractmethod
     def on_setup(self):
@@ -81,15 +81,18 @@ class StreamingDevice(Device):
         self.time_since_last_send: float = 0
 
     def on_setup(self):
+        """@override"""
         self.comms_object.open()
 
     def on_update(self, time_delta: float):
+        """@override"""
         self.time_since_last_send += time_delta
         if self.time_since_last_send > self.settings.interval_ms:
             self.time_since_last_send = 0
             self.comms_object.write(self.settings.data)
 
     def on_destroy(self):
+        """@override"""
         self.comms_object.close()
 
 
