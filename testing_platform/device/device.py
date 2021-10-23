@@ -4,8 +4,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
 from multiprocessing import Pipe, Process
-import serial
-import udp
 import comms
 
 class CommsType(Enum):
@@ -42,9 +40,9 @@ class DeviceType(Enum):
 
 
 class Device(ABC):
-    def __init__(self, id: str, device_type: CommsType):
+    def __init__(self, id: str, comms_type: CommsType):
         self.id = id
-        self.device_type = device_type
+        self.comms_type = comms_type
 
     @abstractmethod
     def on_setup(self):
@@ -82,25 +80,25 @@ class StreamingDevice(Device):
         self.time_since_last_send: float = 0
 
     def on_setup(self):
+        """@override"""
         self.comms_object.open()
 
     def on_update(self, time_delta: float):
+        """@override"""
         self.time_since_last_send += time_delta
         if self.time_since_last_send > self.settings.interval_ms:
             self.time_since_last_send = 0
             self.comms_object.write(self.settings.data)
 
     def on_destroy(self):
+        """@override"""
         self.comms_object.close()
 
 
 def create_comms_object(comms_type: CommsType, config: dict) -> comms.Comms:
     if comms_type == CommsType.SERIAL:
         return comms.SerialComms(comms.SerialSettings.create_from_config(config))
-    elif comms_type == CommsType.UDP_CLIENT:
-        return udp.UDPClient()
-    elif comms_type == CommsType.UDP_SERVER:
-        return udp.UDPServer()
+    # Add other comms interfaces here once implemented
     else:
         raise NotImplementedError
 
@@ -136,9 +134,7 @@ def create_device_and_run(device_configuration: dict, pipe: Pipe):
 
 if __name__ == '__main__':
     send_end, receive_end = Pipe()
-    device_config_s = """{
-                        "devices": 
-                            {"device1": {"id": "device1", "comms_type": "serial","port": "COM7","baud_rate": 9600,"type": "streaming","data": "Hello","interval_ms": 1000}}}"""
+    device_config_s = '{"devices": {"device1": {"id": "device1", "comms_type": "serial","port": "COM7","baud_rate": 9600,"type": "streaming","data": "Hello","interval_ms": 1000}}}'
     device_config = json.loads(device_config_s)
     device = Process(target=create_device_and_run, args=(device_config['devices']['device1'], receive_end))
     device.start()
