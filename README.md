@@ -7,7 +7,7 @@ the standard python venv module.
 
 **Note**: Python 3.8+ is required.
 ```
-cd {REPO_LOCATION}/testing-platform
+cd {REPO_LOCATION}/testing_platform
 python3 -m venv .venv
 
 Windows |  \.venv\Scripts\activate 
